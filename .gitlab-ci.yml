@@ -1,0 +1,27 @@
+stages:
+  - build
+  - deploy
+
+services:
+  - docker:dind
+
+build:
+  stage: build
+  image: koslib/awscliv2-alpine:2.7.20
+  environment: $CI_COMMIT_BRANCH
+  script:
+    - ci/build.sh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "stage" || $CI_COMMIT_BRANCH == "master"'
+  
+deploy:
+  stage: deploy
+  image: koslib/awscliv2-alpine:2.7.20
+  environment: $CI_COMMIT_BRANCH
+  needs:
+    - job: build
+      artifacts: false
+  script:
+    - ci/deploy.sh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "stage" || $CI_COMMIT_BRANCH == "master"'

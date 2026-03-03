@@ -1,0 +1,32 @@
+docker build -t game-server -f Dockerfile .
+docker ps -a
+docker images
+docker run --name game-server-backend -p 3000:3838/tcp -d game-server
+
+
+BUILD IMAGE
+docker build -t my-app .
+
+RUN CONTAINER
+docker run -p 3000:3000 my-app
+
+
+CHECK DOCKER IMAGES
+docker images
+
+LIST RUNNING DOCKER CONTAINERS
+docker ps
+LIST ALL
+docker ps -a
+
+DELETE DOCKER IMAGES
+docker image rm <IMAGE_ID>
+
+GET ALL IMAGE IDs
+docker image ls -q
+
+REMOVE ALL IMAGES (COOL TRICK)
+docker image rm $(docker image ls -q)
+
+REMOVE ALL CONTAINERS FIRST
+docker cotainer rm -f $(docker container ls -q -a)
