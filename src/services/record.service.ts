@@ -1,7 +1,8 @@
 import { createHash } from 'crypto';
 import aleoService from './aleo.service';
-import { db } from '../databases';
+import recordModel from '../models/record.model';
 import { IRecord } from '../interfaces/record.interface';
+import { log } from 'console';
 
 class RecordService {
   /**
@@ -16,20 +17,21 @@ class RecordService {
   public async indexRecord(txHash: string): Promise<IRecord> {
     // 1. Fetch transaction from Aleo network
     const transaction = await aleoService.getTransaction(txHash);
+    console.log(`Fetched transaction for hash ${txHash} ✅`);
 
     // 2. Extract ciphertext + on-chain commitment
-    const { encryptedRecord, commitment } = aleoService.extractRecordOutput(transaction);
+    const  encryptedRecord  = aleoService.extractRecordOutput(transaction);
 
     // 3. Decrypt with view key
     const decryptedRecord = await aleoService.decryptRecord(encryptedRecord);
 
     // 4. Resolve commitment hash
-    const commitmentHash = aleoService.extractCommitmentHash(decryptedRecord, commitment);
+    const commitmentHash = aleoService.extractCommitmentHash(decryptedRecord);
 
     // 5. Generate hash = SHA-256(commitmentHash + ISO timestamp)
     const timestamp = new Date();
     const generatedHash = this.generateHash(commitmentHash, timestamp);
-
+   
     // 6. Persist to DB
     const recordData = {
       tx_hash: txHash,
@@ -39,8 +41,21 @@ class RecordService {
       created_at: timestamp,
     };
 
-    const [savedRecord] = await db('records').insert(recordData).returning('*');
-    return savedRecord as IRecord;
+    return recordModel.create(recordData);
+  }
+
+  /**
+   * Fetches a stored record by its commitment hash, then decrypts it using
+   * the view key and returns the plaintext record data alongside the metadata.
+   */
+  public async getRecordByCommitment(commitmentHash: string): Promise<{ record: IRecord; decrypted: Record<string, any> }> {
+    const record = await recordModel.findByCommitment(commitmentHash);
+    if (!record) {
+      throw new Error(`No record found for commitment: ${commitmentHash}`);
+    }
+
+    const decrypted = await aleoService.decryptRecord(record.encrypted_record);
+    return { record, decrypted };
   }
 
   private generateHash(commitment: string, timestamp: Date): string {
