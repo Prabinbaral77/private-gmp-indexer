@@ -1,8 +1,1 @@
-export interface IRecord {
-  id?: number;
-  tx_hash: string;
-  encrypted_record: string;
-  commitment_hash: string;
-  generated_hash: string;
-  created_at?: Date;
-}
+export type { ClaimRecord, NewClaimRecord, WithdrawRecord, NewWithdrawRecord } from '../db/schema/record.schema';

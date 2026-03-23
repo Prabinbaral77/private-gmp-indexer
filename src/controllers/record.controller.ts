@@ -1,23 +1,24 @@
 import { NextFunction, Request, Response } from 'express';
 import recordService from '../services/record.service';
-import { CreateRecordDto } from '../dtos/record.dto';
-import { log } from 'console';
+import { type CreateRecordDto } from '../dtos/record.dto';
 
 class RecordController {
   public indexRecord = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      console.log('Received request to index record with body:', req.body);
-      const recordData: CreateRecordDto = req.body;
-      const result = await recordService.indexRecord(recordData.txHash);
+      const { txHash }: CreateRecordDto = req.body;
+      const result = await recordService.indexRecord(txHash);
 
       res.status(201).json({
         success: true,
         message: 'Record added successfully',
         data: {
-          tx_hash: result.tx_hash,
-          generated_hash: result.generated_hash,
-          commitment_hash: result.commitment_hash,
-          created_at: result.created_at,
+          txHash: result.txHash,
+          commitmentHash: result.commitmentHash,
+          programId: result.programId,
+          transitionType: result.transitionType,
+          network: result.network,
+          isSpent: result.isSpent,
+          createdAt: result.createdAt,
         },
       });
     } catch (error) {
@@ -33,11 +34,14 @@ class RecordController {
       res.status(200).json({
         success: true,
         data: {
-          tx_hash: record.tx_hash,
-          commitment_hash: record.commitment_hash,
-          generated_hash: record.generated_hash,
-          created_at: record.created_at,
-          decrypted_record: decrypted,
+          txHash: record.txHash,
+          commitmentHash: record.commitmentHash,
+          programId: record.programId,
+          transitionType: record.transitionType,
+          network: record.network,
+          isSpent: record.isSpent,
+          createdAt: record.createdAt,
+          decryptedRecord: decrypted,
         },
       });
     } catch (error) {

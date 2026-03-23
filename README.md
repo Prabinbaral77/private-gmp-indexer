@@ -1,6 +1,6 @@
 # Private GMP Indexer
 
-A TypeScript REST API service for indexing and retrieving encrypted Aleo records from the Aleo blockchain. Built for the **Global Message Protocol (GMP)** on Aleo's private network, this service fetches transaction data, decrypts records using a ViewKey, and persists them in PostgreSQL for efficient querying.
+A TypeScript REST API service for indexing and retrieving encrypted Aleo records from the Aleo blockchain. Built for the **General Message Protocol (GMP)** on Aleo's private network, this service fetches transaction data, decrypts records using a ViewKey, and persists them in PostgreSQL for efficient querying.
 
 ---
 
@@ -61,13 +61,12 @@ Routes → Controllers → Services → Models → Database
 | Language | TypeScript 5.3 (strict mode, ES2022) |
 | Runtime | Node.js 18+ |
 | Framework | Express 4.18 |
-| Database | PostgreSQL (via Knex 3.1) |
+| Database | PostgreSQL (via drizzle) |
 | Aleo SDK | @provablehq/sdk 0.7.5, @provablehq/wasm 0.9.17 |
 | Validation | class-validator, class-transformer, envalid |
 | Logging | Winston |
 | Security | Helmet, CORS |
 | Dev Tools | nodemon, ts-node, ESLint, Prettier |
-| Deployment | Docker, PM2 |
 
 ---
 
@@ -255,7 +254,7 @@ commitment
 src/
 ├── config/           # Environment config exports
 ├── controllers/      # Express request handlers
-├── databases/        # Knex setup, connection pool, auto-migration
+├── db/        # drizzle setup, connection pool, auto-migration
 ├── dtos/             # Request validation schemas (class-validator)
 ├── enums/            # Shared enumerations
 ├── exceptions/       # HttpException and custom error classes

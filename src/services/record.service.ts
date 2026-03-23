@@ -1,26 +1,23 @@
-import { createHash } from 'crypto';
 import aleoService from './aleo.service';
-import recordModel from '../models/record.model';
-import { IRecord } from '../interfaces/record.interface';
-import { log } from 'console';
+import { recordModel } from '../db/record.model';
+import { type AleoRecord } from '../db/schema/record.schema';
+import { ALEO_NETWORK } from '../config';
 
 class RecordService {
   /**
    * Full pipeline:
    *  1. Fetch the Aleo transaction
-   *  2. Extract the encrypted record ciphertext + on-chain commitment (output.id)
+   *  2. Extract the encrypted record ciphertext, program id, and function name
    *  3. Decrypt the record using the view key
-   *  4. Resolve the commitment hash (from decrypted data, falling back to output.id)
-   *  5. Generate a new hash from commitment + current timestamp
-   *  6. Persist everything to PostgreSQL and return the saved row
+   *  4. Resolve the commitment hash from the decrypted data
+   *  5. Persist to the records table
    */
-  public async indexRecord(txHash: string): Promise<IRecord> {
+  public async indexRecord(txHash: string): Promise<AleoRecord> {
     // 1. Fetch transaction from Aleo network
     const transaction = await aleoService.getTransaction(txHash);
-    console.log(`Fetched transaction for hash ${txHash} ✅`);
 
-    // 2. Extract ciphertext + on-chain commitment
-    const  encryptedRecord  = aleoService.extractRecordOutput(transaction);
+    // 2. Extract ciphertext + transition metadata
+    const { encryptedRecord, programId, functionName } = aleoService.extractRecordOutput(transaction);
 
     // 3. Decrypt with view key
     const decryptedRecord = await aleoService.decryptRecord(encryptedRecord);
@@ -28,40 +25,38 @@ class RecordService {
     // 4. Resolve commitment hash
     const commitmentHash = aleoService.extractCommitmentHash(decryptedRecord);
 
-    // 5. Generate hash = SHA-256(commitmentHash + ISO timestamp)
-    const timestamp = new Date();
-    const generatedHash = this.generateHash(commitmentHash, timestamp);
-   
-    // 6. Persist to DB
-    const recordData = {
-      tx_hash: txHash,
-      encrypted_record: encryptedRecord,
-      commitment_hash: commitmentHash,
-      generated_hash: generatedHash,
-      created_at: timestamp,
-    };
+    // 5. If a record with this commitment already exists, mark it spent
+    const existing = await recordModel.findByCommitment(commitmentHash);
+    if (existing) {
+      await recordModel.markSpentByCommitment(commitmentHash);
+    }
 
-    return recordModel.create(recordData);
+    // 6. Persist the new record
+    return recordModel.create({
+      txHash,
+      encryptedRecord,
+      commitmentHash,
+      programId,
+      transitionType: functionName,
+      network: ALEO_NETWORK ?? 'testnet',
+    });
   }
 
   /**
-   * Fetches a stored record by its commitment hash, then decrypts it using
-   * the view key and returns the plaintext record data alongside the metadata.
+   * Fetches a stored record by its commitment hash, then decrypts it on the fly.
    */
-  public async getRecordByCommitment(commitmentHash: string): Promise<{ record: IRecord; decrypted: Record<string, any> }> {
+  public async getRecordByCommitment(commitmentHash: string): Promise<{
+    record: AleoRecord;
+    decrypted: { [key: string]: any };
+  }> {
     const record = await recordModel.findByCommitment(commitmentHash);
+
     if (!record) {
       throw new Error(`No record found for commitment: ${commitmentHash}`);
     }
 
-    const decrypted = await aleoService.decryptRecord(record.encrypted_record);
+    const decrypted = await aleoService.decryptRecord(record.encryptedRecord);
     return { record, decrypted };
-  }
-
-  private generateHash(commitment: string, timestamp: Date): string {
-    return createHash('sha256')
-      .update(`${commitment}:${timestamp.toISOString()}`)
-      .digest('hex');
   }
 }
 

@@ -10,26 +10,28 @@
     "dev": "cross-env NODE_ENV=development nodemon",
     "build": "tsc --build && resolve-tspaths",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@provablehq/sdk": "^0.7.5",
     "@provablehq/wasm": "^0.9.17",
     "axios": "^1.6.0",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
+    "drizzle-orm": "^0.39.3",
     "envalid": "^8.0.0",
     "express": "^4.18.2",
     "helmet": "^7.1.0",
-    "knex": "^3.1.0",
     "morgan": "^1.10.0",
     "pg": "^8.11.3",
-    "reflect-metadata": "^0.2.1",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/compression": "^1.7.5",
@@ -40,6 +42,7 @@
     "@types/pg": "^8.10.9",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
+    "drizzle-kit": "^0.30.6",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",

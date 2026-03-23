@@ -3,9 +3,9 @@ import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import 'reflect-metadata';
 import { ENVIRONMENT, PORT, LOG_FORMAT } from './config';
-import { runMigrations } from './databases';
+import { db } from './db';
+import { sql } from 'drizzle-orm';
 import { Routes } from './interfaces/routes.interface';
 import errorMiddleware from './middlewares/error.middleware';
 import { logger, stream } from './utils/logger';
@@ -40,10 +40,11 @@ class App {
 
   private async initializeDatabase() {
     try {
-      await runMigrations();
-      logger.info('PostgreSQL connected and migrations run.');
+      // Verify the connection is live by running a trivial query
+      await db.execute(sql`select 1`);
+      logger.info('PostgreSQL connected.');
     } catch (error) {
-      logger.error('Failed to initialize PostgreSQL:', error);
+      logger.error('Failed to connect to PostgreSQL:', error);
     }
   }
 

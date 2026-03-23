@@ -5,7 +5,8 @@ import { ALEO_NODE_URL, ALEO_NETWORK, ALEO_VIEW_KEY } from '../config';
 
 export interface RecordOutput {
   encryptedRecord: string; // "record1..." ciphertext
-  commitment: string;      // the record commitment (output.id in the transaction)
+  programId: string;       // e.g. "gmp_private.aleo"
+  functionName: string;    // e.g. "claim" or "withdraw"
 }
 
 class AleoService {
@@ -30,7 +31,7 @@ class AleoService {
    *   - id    : the record commitment (a field element)
    *   - value : the encrypted record ciphertext ("record1...")
    */
-  public extractRecordOutput(transaction: any): string {
+  public extractRecordOutput(transaction: any): RecordOutput {
     const transitions: any[] = transaction?.execution?.transitions ?? [];
 
     const targetFunctions = ['claim', 'withdraw'];
@@ -43,7 +44,11 @@ class AleoService {
       if (record) {
         if (!record.value) throw new Error('Record output is missing the ciphertext value.');
         if (!record.id) throw new Error('Record output is missing the record id.');
-        return record.value
+        return {
+          encryptedRecord: record.value,
+          programId: transition.program ?? '',
+          functionName: transition.function ?? '',
+        };
       }
     }
     throw new Error('No record output found in claim/withdraw transitions.');

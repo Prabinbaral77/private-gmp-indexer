@@ -1,13 +1,12 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { z } from 'zod';
 
-export class CreateRecordDto {
-  @IsString()
-  @IsNotEmpty()
-  public txHash: string;
-}
+export const createRecordSchema = z.object({
+  txHash: z.string().min(1, 'Transaction hash is required'),
+});
 
-export class GetRecordByCommitmentDto {
-  @IsString()
-  @IsNotEmpty()
-  public commitment: string;
-}
+export const getRecordByCommitmentSchema = z.object({
+  commitment: z.string().min(1, 'Commitment hash is required'),
+});
+
+export type CreateRecordDto = z.infer<typeof createRecordSchema>;
+export type GetRecordByCommitmentDto = z.infer<typeof getRecordByCommitmentSchema>;
