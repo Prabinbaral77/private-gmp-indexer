@@ -10,6 +10,7 @@ import { Routes } from './interfaces/routes.interface';
 import errorMiddleware from './middlewares/error.middleware';
 import { logger, stream } from './utils/logger';
 import { createServer, Server } from 'http';
+import aleoScannerService from './services/scanner.service';
 
 class App {
   public app: express.Application;
@@ -35,6 +36,7 @@ class App {
       logger.info(`======= ENV: ${this.env} =======`);
       logger.info(`🚀 App listening on the port ${this.port}`);
       logger.info(`=================================`);
+      aleoScannerService.start();
     });
   }
 

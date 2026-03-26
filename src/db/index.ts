@@ -1,8 +1,9 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD } from '../config';
-import { claimRecords, withdrawRecords } from './schema/record.schema';
-const schema = { claimRecords, withdrawRecords };
+import { records } from './schema/record.schema';
+import { scannedBlocks, errorBlocks } from './schema/scanner.schema';
+const schema = { records, scannedBlocks, errorBlocks };
 
 const pool = new Pool({
   host: DB_HOST,
