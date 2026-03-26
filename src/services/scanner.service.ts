@@ -1,10 +1,10 @@
-import { ALEO_NETWORK } from '@config';
-import { logger } from '../utils/logger';
-import { recordModel } from '../db/record.model';
-import { ALEO_SCANNER_CONFIG } from '../config/aleo.config';
-import { scannedBlockModel, errorBlockModel } from '../db/scanner.model';
+import { ALEO_NETWORK } from '../config/index.js';
+import { logger } from '../utils/logger.js';
+import { recordModel } from '../db/record.model.js';
+import { ALEO_SCANNER_CONFIG } from '../config/aleo.config.js';
+import { scannedBlockModel, errorBlockModel } from '../db/scanner.model.js';
 // import type { RecordScanner as RecordScannerType, ScannerConfig } from 'aleo-record-scanner';
-import { ScannerError, ScannerProgress, ScannerRecord } from '@interfaces/scanner.interface';
+import { ScannerError, ScannerProgress, ScannerRecord } from '../interfaces/scanner.interface.js';
 import { RecordScanner } from 'aleo-record-scanner';
 
 
@@ -69,7 +69,6 @@ class AleoScannerService {
 
   private async handleRecord(record: ScannerRecord): Promise<void> {
     logger.info('[Scanner] Record found', { txHash: record.txHash, blockHeight: record.blockHeight });
-console.log('Record details:', record);
     try {
       if (!record.txHash || !record.encryptedRecords || record.encryptedRecords.length === 0) {
         logger.warn('[Scanner] Incomplete record payload — skipping persistence', { record });
@@ -98,7 +97,10 @@ console.log('Record details:', record);
   }
 
   private async handleProgress({ currentBlock, latestBlock }: ScannerProgress): Promise<void> {
-    logger.debug(`[Scanner] Progress ${currentBlock}/${latestBlock}`);
+    const progress = ((currentBlock / latestBlock) * 100).toFixed(2);
+    const remaining = latestBlock - currentBlock;
+
+    logger.debug(`[Scanner] Syncing blocks → current: ${currentBlock}, latest: ${latestBlock}, progress: ${progress}%, remaining: ${remaining} ⏳⏳⏳`);
 
     try {
       await scannedBlockModel.upsert(currentBlock);

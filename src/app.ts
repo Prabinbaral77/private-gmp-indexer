@@ -3,14 +3,14 @@ import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { ENVIRONMENT, PORT, LOG_FORMAT } from './config';
-import { db } from './db';
+import { ENVIRONMENT, PORT, LOG_FORMAT } from './config/index.js';
+import { db } from './db/index.js';
 import { sql } from 'drizzle-orm';
-import { Routes } from './interfaces/routes.interface';
-import errorMiddleware from './middlewares/error.middleware';
-import { logger, stream } from './utils/logger';
+import { Routes } from './interfaces/routes.interface.js';
+import errorMiddleware from './middlewares/error.middleware.js';
+import { logger, stream } from './utils/logger.js';
 import { createServer, Server } from 'http';
-import aleoScannerService from './services/scanner.service';
+import aleoScannerService from './services/scanner.service.js';
 
 class App {
   public app: express.Application;

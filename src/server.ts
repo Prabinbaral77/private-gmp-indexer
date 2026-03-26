@@ -1,6 +1,6 @@
-import App from './app';
-import validateEnv from './utils/validateEnv';
-import RecordRoute from './routes/record.route';
+import App from './app.js';
+import validateEnv from './utils/validateEnv.js';
+import RecordRoute from './routes/record.route.js';
 
 validateEnv();
 

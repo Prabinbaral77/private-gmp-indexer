@@ -1,7 +1,7 @@
-import aleoService from './aleo.service';
-import { recordModel } from '../db/record.model';
-import { type AleoRecord } from '../db/schema/record.schema';
-import { ALEO_NETWORK } from '../config';
+import aleoService from './aleo.service.js';
+import { recordModel } from '../db/record.model.js';
+import { type AleoRecord } from '../db/schema/record.schema.js';
+import { ALEO_NETWORK } from '../config/index.js';
 
 class RecordService {
   /**

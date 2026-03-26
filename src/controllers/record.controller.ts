@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import recordService from '../services/record.service';
-import { type CreateRecordDto } from '../dtos/record.dto';
+import recordService from '../services/record.service.js';
+import { type CreateRecordDto } from '../dtos/record.dto.js';
 
 class RecordController {
   public indexRecord = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

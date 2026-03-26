@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
-import { db } from './index';
-import { records, type AleoRecord, type NewRecord } from './schema/record.schema';
+import { db } from './index.js';
+import { records, type AleoRecord, type NewRecord } from './schema/record.schema.js';
 
 class RecordModel {
   public async create(data: NewRecord): Promise<AleoRecord> {

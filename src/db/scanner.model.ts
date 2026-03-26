@@ -1,11 +1,11 @@
 import { eq, sql } from 'drizzle-orm';
-import { db } from './index';
+import { db } from './index.js';
 import {
   scannedBlocks,
   errorBlocks,
   type ScannedBlock,
   type ErrorBlock,
-} from './schema/scanner.schema';
+} from './schema/scanner.schema.js';
 
 /** Singleton row id — both tables always contain exactly one row with this id */
 const SINGLETON_ID = 1;

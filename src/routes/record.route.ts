@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import RecordController from '../controllers/record.controller';
-import { createRecordSchema } from '../dtos/record.dto';
-import { Routes } from '../interfaces/routes.interface';
-import validationMiddleware from '../middlewares/validation.middleware';
+import RecordController from '../controllers/record.controller.js';
+import { createRecordSchema } from '../dtos/record.dto.js';
+import { Routes } from '../interfaces/routes.interface.js';
+import validationMiddleware from '../middlewares/validation.middleware.js';
 
 class RecordRoute implements Routes {
   public path = '/gmp/private/record';

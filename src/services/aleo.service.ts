@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import { ALEO_NODE_URL, ALEO_NETWORK, ALEO_VIEW_KEY } from '../config';
+import { ALEO_NODE_URL, ALEO_NETWORK, ALEO_VIEW_KEY } from '../config/index.js';
 
 export interface RecordOutput {
   encryptedRecord: string; // "record1..." ciphertext
