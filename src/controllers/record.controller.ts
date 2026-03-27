@@ -26,6 +26,24 @@ class RecordController {
     }
   };
 
+  public getSpentRecords = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const records = await recordService.getSpentRecords();
+      res.status(200).json({ success: true, recordCount: records.length, data: records });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getUnspentRecords = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const records = await recordService.getUnspentRecords();
+      res.status(200).json({ success: true, recordCount: records.length, data: records });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public getRecordByCommitment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { commitment } = req.params;

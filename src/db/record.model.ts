@@ -41,6 +41,16 @@ class RecordModel {
     logger.debug('[RecordModel] Fetching all records');
     return db.select().from(records).orderBy(records.createdAt);
   }
+
+  public async findSpent(): Promise<AleoRecord[]> {
+    logger.debug('[RecordModel] Fetching spent records');
+    return db.select().from(records).where(eq(records.isSpent, true)).orderBy(records.createdAt);
+  }
+
+  public async findUnspent(): Promise<AleoRecord[]> {
+    logger.debug('[RecordModel] Fetching unspent records');
+    return db.select().from(records).where(eq(records.isSpent, false)).orderBy(records.createdAt);
+  }
 }
 
 export const recordModel = new RecordModel();

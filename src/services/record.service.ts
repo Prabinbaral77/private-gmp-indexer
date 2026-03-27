@@ -42,6 +42,14 @@ class RecordService {
     });
   }
 
+  public async getSpentRecords(): Promise<AleoRecord[]> {
+    return recordModel.findSpent();
+  }
+
+  public async getUnspentRecords(): Promise<AleoRecord[]> {
+    return recordModel.findUnspent();
+  }
+
   /**
    * Fetches a stored record by its commitment hash, then decrypts it on the fly.
    */

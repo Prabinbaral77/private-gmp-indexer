@@ -15,6 +15,8 @@ class RecordRoute implements Routes {
 
   private initializeRoutes() {
     this.router.post(`${this.path}`, validationMiddleware(createRecordSchema, 'body'), this.recordController.indexRecord);
+    this.router.get(`${this.path}s/spent`, this.recordController.getSpentRecords);
+    this.router.get(`${this.path}s/unspent`, this.recordController.getUnspentRecords);
     this.router.get(`${this.path}/:commitment`, this.recordController.getRecordByCommitment);
   }
 }
