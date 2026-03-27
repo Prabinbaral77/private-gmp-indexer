@@ -25,9 +25,9 @@ class RecordService {
     // 4. Resolve commitment hash
     const commitmentHash = aleoService.extractCommitmentHash(decryptedRecord);
 
-    // 5. If a record with this commitment already exists, mark it spent
-    const existing = await recordModel.findByCommitment(commitmentHash);
-    if (existing) {
+    // 5. Mark ALL existing records with the same commitment as spent
+    const existing = await recordModel.findAllByCommitment(commitmentHash);
+    if (existing.length > 0) {
       await recordModel.markSpentByCommitment(commitmentHash);
     }
 

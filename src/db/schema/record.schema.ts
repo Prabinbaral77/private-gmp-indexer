@@ -12,10 +12,11 @@
  *   transition_type  – Transition function name ("claim" | "withdraw")
  *   network          – Aleo network identifier (e.g. "testnet", "mainnet")
  *   is_spent         – Whether the record has been spent
+ *   block_height     – Block number on which the record was found
  *   created_at       – UTC timestamp when this record was indexed
  */
 
-import { boolean, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const records = pgTable('records', {
   id: serial('id').primaryKey(),
@@ -26,6 +27,7 @@ export const records = pgTable('records', {
   transitionType: text('transition_type').notNull(),
   network: text('network').notNull(),
   isSpent: boolean('is_spent').default(false).notNull(),
+  blockHeight: integer('block_height'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -38,4 +40,5 @@ export type NewRecord = {
   network: string;
   programId?: string | null;
   isSpent?: boolean;
+  blockHeight?: number | null;
 };

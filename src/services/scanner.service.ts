@@ -75,21 +75,36 @@ class AleoScannerService {
         return;
       }
 
-      const existing = await recordModel.findByTxHash(record.txHash);
-      if (existing) {
+      // Skip if this transaction was already indexed
+      const existingByTx = await recordModel.findByTxHash(record.txHash);
+      if (existingByTx) {
         logger.debug('[Scanner] Record already indexed, skipping', { txHash: record.txHash });
         return;
       }
 
+      const commitmentHash = (record.decryptedRecords?.[0]?.commitment as string | undefined) ?? '';
+
+      // Mark ALL existing records with the same commitment as spent before inserting the new one
+      if (commitmentHash) {
+        const existing = await recordModel.findAllByCommitment(commitmentHash);
+        if (existing.length > 0) {
+          const markedCount = await recordModel.markSpentByCommitment(commitmentHash);
+          logger.info(`[Scanner] Marked ${markedCount} existing record(s) as spent`, {
+            commitmentHash,
+            txHashes: existing.map(r => r.txHash),
+          });
+        }
+      }
+
       await recordModel.create({
         txHash: record.txHash,
-        encryptedRecord: record.encryptedRecords[0], // Store the first encrypted record; adjust if multiple records per tx need handling
-        // Commitment hash will be populated when decrypted via the API route;
-        // use empty string as placeholder so NOT NULL is satisfied.
-        commitmentHash: (record.decryptedRecords?.[0]?.commitment as string | undefined) ?? '',
-        programId: record.programId ?? ALEO_SCANNER_CONFIG[ALEO_NETWORK].programName,
-        transitionType: record.functionName ?? ALEO_SCANNER_CONFIG[ALEO_NETWORK].functionName,
+        encryptedRecord: record.encryptedRecords[0],
+        commitmentHash,
+        programId: record.programId ?? ALEO_SCANNER_CONFIG[ALEO_NETWORK].programs[0]?.programName,
+        transitionType: record.functionName ?? ALEO_SCANNER_CONFIG[ALEO_NETWORK].programs[0]?.functionNames[0],
         network: ALEO_NETWORK,
+        blockHeight: record.blockHeight,
+        isSpent: false,
       });
     } catch (err) {
       logger.error('[Scanner] Failed to persist record', { txHash: record.txHash, err });
